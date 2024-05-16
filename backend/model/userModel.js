@@ -17,7 +17,7 @@ email: {
 
   password: {
     type: String,
-    required: [true, "password in required"],
+    required: [true, "password is required"],
     minLength: [6,"password should be greater than 6 charactors"],
     select: false
   },

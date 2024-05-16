@@ -12,9 +12,25 @@ const connectToMongo = () => {
     console.log(error)
   })
 }
+
+// handle uncaught exceptions
+process.on("uncaughtException", (err) => {
+  console.log("error = ", err.message)
+  console.log("Shutting down the application now for uncaught exceptions")
+})
+
 connectToMongo()
 const port = process.env.PORT
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log("Our app is running on PORT " + port)
 } )
+
+process.on("unhandledRejection", (err) => {
+  console.log(`${err.name} ${err.message}`)
+  //close server
+  server.close(()=> {
+    //exit node process
+    process.exit(1)
+  })
+})
