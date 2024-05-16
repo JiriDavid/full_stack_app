@@ -51,6 +51,29 @@ exports.register = catchAsync(
     
   }
 ) 
+
+//activate user 
+exports.activateUser = catchAsync(async (req, res, next) => {
+  // 1. Verify the token
+  jwt.verify(req.body.activationToken, proces.anv.ACTIVATION_SECRET)
+
+  // 2. Check if user dta is available and find user
+  if(!userData) return next(new AppError("your token is wrong", 400))
+
+    const dbUser = await User.findOne({email: userData.email})
+
+  // 3. if there is a user, throw an error else create 
+   if(dbUser){
+    return next(new AppError("User already exist", 400))
+   }
+
+  // 4. delete subscriber with storename
+
+  // 5. create subscriber with newly created userId
+
+  //send response
+})
+
 //brokangaccountactivation
 
 //login user
