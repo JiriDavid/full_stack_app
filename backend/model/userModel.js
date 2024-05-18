@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt")
+const crypto = require("crypto")
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -62,6 +63,7 @@ email: {
   active: {
     type: Boolean,
     default: true,
+    select: false
   },
 },
   {
@@ -79,10 +81,46 @@ userSchema.pre("save", async function(next){
     this.password = hashedPassword
     next()
 })
+
+userSchema.pre("save", async function(next) {
+  if(!this.isDirectModified("passwordChangedAt") || this.isNew()) return next()
+  this.passwordChangedAt = Date.now() - 1000  
+})
+
+userSchema.pre(/^find/, function(next){
+  this.find({active: true})
+  next()
+})
+
 //instance method to hash password
 userSchema.methods.comparePassword = async function(userPassword, dbPassword){
   return await bcrypt.compare(userPassword, dbPassword)
 }
+
+// instance method to generateResetToken
+userSchema.methods.generateResetToken = function(){
+  // ceate resetToken using crypto
+  const resetToken = crypto.randomBytes(32).toString("hex")
+
+  const hashedResetToken = crypto.createHash("SHA-256").update(resetToken).digest("hex")
+
+  this.passwordResetToken = hashedResetToken
+  this.passwordResetExpire = Date.now() + 10 * 60 * 1000
+
+  return resetToken
+}
+
+// instance method to check if password was changed before the token issued
+userSchema.methods.changedPasswordAfter = function(jwtTimeSpan){
+  
+  if(this.passwordChangedAt){
+    const changedTime = parseInt(this.passwordChangedAt.getTime()/ 1000)
+    return jwtTimeSpan < changedTime
+  }
+
+  return false
+}
+
 
 const User = mongoose.model("User", userSchema)
 

@@ -1,9 +1,26 @@
 const express = require("express")
-const {register, login} = require("../controller/authController")
+const {register, login, activateUser, forgotPassword, resetPassword, updatePassword} = require("../controller/authController")
+const { isAuthenticated, restrictToAdmin } = require("../middleware/auth")
+const { deactivateUser, getSingleUser, getUsers, updateMe } = require("../controller/userController")
+
 
 const router = express.Router()
 
+// auth route
 router.route("/register").post(register)
 router.route("/login").post(login)
+router.route("/activate").post(activateUser)
+router.route("/forgotPassword").post(forgotPassword)
+router.route("/resetPassword/:token").post(resetPassword)
+
+
+router.route("/updatePassword").put(isAuthenticated, updatePassword)
+
+//user routes
+router.route("/").get(isAuthenticated, restrictToAdmin("admin"), getUsers)
+router.route("/:userId").get(isAuthenticated, getSingleUser)
+router.route("/me").put(isAuthenticated, updateMe)
+router.route("/deactivate/:userId").put(isAuthenticated, restrictToAdmin("admin"), deactivateUser)
+
 
 module.exports = router
