@@ -3,9 +3,12 @@ const dotenv = require("dotenv")
 const bodyParser = require("body-parser")
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
-const userRouter =  require("./routes/userRoutes")
 const AppError = require("./utils/AppError")
 const GlobalErrorHandler = require("./controller/errorController")
+
+const userRouter =  require("./routes/userRoutes")
+const productRouter = require("./routes/productRoutes")
+const followRouter = require("./routes/followerRoutes")
 
 
 dotenv.config();
@@ -21,6 +24,8 @@ app.get("/test", (req, res)=>{
   res.status(200).send("Hello welcome to brokang market")
 })
 app.use("/api/v1/user", userRouter)
+app.use("/api/v1/product", productRouter)
+app.use("/api/v1/follow", followRouter)
 
 app.all("*", (req, res, next) => {
   next(
