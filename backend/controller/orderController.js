@@ -1,7 +1,8 @@
 const Order = require("../model/orderModel")
 const Product = require("../model/productModel");
-const { findById } = require("../model/userModel");
+const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync")
+
 
 //create an Order
 exports.createOrder = catchAsync(async(req, res, next)=>{
@@ -43,8 +44,12 @@ exports.getUserOrders = catchAsync(async(req, res, next)=>{
 
 //get an order 
 exports.getAnOrder = catchAsync(async(req, res, next)=>{
-  const order = await findById(req.params.id).populate("product", "title images userId")
+  
+  const order = await Order.findById(req.params.id).populate("product", "title images userId")
 
+  if (!order) {
+    return next(new AppError("Order not found", 404)); 
+  }
   res.status(200).json({
     success: true,
     order
