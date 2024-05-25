@@ -17,13 +17,7 @@ const productSchema = new mongoose.Schema({
     require: [true, "A product must have a price"]
   },
   discountPrice: Number,
-  images:[ 
-    {
-    id: String,
-    publicId: String,
-    url: String
-  }
-],
+  images:[ String ],
 shippingFee: {
   type: Number,
   required: [true, "Shipping fee is required"]

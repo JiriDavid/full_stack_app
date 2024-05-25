@@ -41,7 +41,7 @@ exports.getUsers = catchAsync(async (req, res, next) => {
 
 //get a single user
 exports.getSingleUser = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.userId)
+  const user = await User.findById(req.params.userId).populate("likes")
 
   res.status(200).json({
     success: true,
@@ -59,5 +59,41 @@ exports.deactivateUser = catchAsync(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Successfully deactivated the user"
+  })
+})
+
+// add address
+exports.addAddress = catchAsync(async (req, res, next) => {
+
+  const user = await User.findByIdAndUpdate(req.user.id, {
+    $push: {
+      address: req.body
+    }
+  }, {new: true, runValidators: false})
+  
+  res.status(200).json({
+    success: true,
+    user
+  })
+})
+
+
+
+// remove address
+exports.removeAddress = catchAsync(async (req, res, next) => {
+
+  const user = await User.findByIdAndUpdate(req.user.id, {
+    $pull: {
+      address: {
+        _id: req.params.addressId
+      }
+    }
+  },
+  {new: true, runValidators: false}
+)
+
+  res.status(200).json({
+    success: true,
+    user
   })
 })

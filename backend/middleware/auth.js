@@ -2,12 +2,16 @@ const User = require("../model/userModel")
 const AppError = require("../utils/AppError")
 const catchAsync = require("../utils/catchAsync")
 const jwt = require("jsonwebtoken")
-
+const Blacklist = require("../model/blacklistModel")
 
 exports.isAuthenticated = catchAsync(async (req, res, next) => {
   // 1. get token from req.cookies
   const {bk_token} = req.cookies;
-  console.log(bk_token)
+  //const tokenString = bk_token.split('.')[1]
+
+  //const isTokenInBlacklist = await Blacklist.findOne({token: tokenString})
+
+  //console.log(isTokenInBlacklist);
 
   if(!bk_token) return next(new AppError("Please login to continue", 400))
 

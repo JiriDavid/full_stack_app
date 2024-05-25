@@ -55,6 +55,12 @@ email: {
     default: "user"
   },
 
+  address:[ {
+    label: String,
+    address1: String,
+    address2: String,
+    addressType: String
+  }],
   
   passwordChangedAt: Date,
   passwordResetToken: String,
@@ -67,10 +73,18 @@ email: {
   },
 },
   {
-    timestamps: true
+    timestamps: true,
+    toJSON: {virtuals: true},
+    toObject: {virtuals: true}
   }
   
 );
+
+userSchema.virtual("likes", {
+  ref: "Like",
+  foreignField: "user",
+  localField: "_id",
+})
 
 userSchema.pre("save", async function(next){
   //check if the password has not been modified

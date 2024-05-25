@@ -3,6 +3,14 @@ const User = require("../model/userModel")
 const catchAsync = require("../utils/catchAsync")
 const AppError = require("../utils/AppError")
 
+const cloudinary = require("cloudinary").v2
+
+cloudinary.config({
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_NAME
+})
+
 
 //createProduct
 exports.createProduct = catchAsync(async (req, res, next) => {
@@ -127,5 +135,20 @@ exports.updateManyProducts = catchAsync(async(req, res, next)=>{
   res.status(200).json({
     success: true,
     message: "Products updated successfully"
+  })
+})
+
+
+// delete image from cloudinary
+exports.deleteImage = catchAsync(async(req, res, next)=>{
+  const {publicId} = req.body;
+
+  await cloudinary.uploader.destroy(publicId)
+
+  await Product.bulkWrite(updateOperation);
+
+  res.status(200).json({
+    success: true,
+    message: "Image deleted successfully"
   })
 })

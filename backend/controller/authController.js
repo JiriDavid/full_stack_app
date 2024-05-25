@@ -4,6 +4,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
 const novu = require("../utils/novu")
 const crypto = require("crypto")
+//const Blacklist = require("../model/blacklistModel")
 
 const createActivationLink = (user) => {
   return jwt.sign(user, process.env.ACTIVATION_SECRET, {expiresIn: '10m'})
@@ -244,4 +245,27 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   })
 })
 
+//Load user
+exports.loadUser = catchAsync(async (req, res, next)=>{
+  const userId = req.user.id
+  const user = await User.findById(userId).populate("likes")
+
+  res.status(200).json({
+    success: true,
+    user,
+  })
+})
+
+
+// exports.logout = async (req, res, next) => {
+//   const userToken = req.cookies;
+
+//   const tokenString = userToken.split('.')[1]
+  
+//   await Blacklist.create({token: tokenString})
+
+//   res.status(201).json({ 
+//     success: true,
+//     message: "Successfully logged out" });
+// };
 

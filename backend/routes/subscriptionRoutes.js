@@ -7,6 +7,6 @@ const router = express.Router()
 router.route("/:sellerId").post(isAuthenticated, createSubscription)
 router.route("/unsubscribe/:sellerId").post(isAuthenticated, deleteSubscription)
 router.route("/isSubscribed/:sellerId").get(isAuthenticated, checkSubscription)
-
+router.route("/subscriptions").get(isAuthenticated, getAllSubscription)
 
 module.exports = router
