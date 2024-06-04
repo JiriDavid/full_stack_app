@@ -118,7 +118,7 @@ exports.login = catchAsync(
     
     // 2. check if user exist
     if(!dbUser){
-      next(new AppError("we don't have a user with that email", 404))
+      next(new AppError("we don't have a user with that email", 400))
     } else {
       // 3. compare passwords
       const comparePassword = await dbUser.comparePassword(password, dbUser.password)
@@ -257,15 +257,17 @@ exports.loadUser = catchAsync(async (req, res, next)=>{
 })
 
 
-// exports.logout = async (req, res, next) => {
-//   const userToken = req.cookies;
+//logout user
+exports.logoutUser = catchAsync(async (req, res, next) => {
+	res.cookie("bk_token", null, {
+		expires: new Date(Date.now()),
+		httpOnly: true,
+		sameSite: "none",
+		secure: true,
+	})
 
-//   const tokenString = userToken.split('.')[1]
-  
-//   await Blacklist.create({token: tokenString})
-
-//   res.status(201).json({ 
-//     success: true,
-//     message: "Successfully logged out" });
-// };
-
+	res.status(200).json({
+		success: true,
+		message: "User logged out successfully",
+	})
+})

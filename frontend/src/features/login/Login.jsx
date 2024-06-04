@@ -1,15 +1,22 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { loginUser } from "./login";
 
 function Login() {
+  const { mutate, isLoading } = loginUser();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty, isValid },
   } = useForm({ mode: "onTouched" });
-  const sumbitForm = (data) => {
-    console.log(data);
+  const submitForm = (data) => {
+    mutate(data, {
+      onSuccess: () => {
+        navigate("/");
+      },
+    });
   };
   return (
     <div className="min-h-screen text-left flex flex-col justify-center py-14 sm:px-4 lg:px-8">
@@ -19,7 +26,7 @@ function Login() {
 
       <div className="mt-8 mx-auto w-full max-w-md">
         <div className="bg-white w-full py-8 px-4 shadow sm:rounded-lg">
-          <form onSubmit={handleSubmit(sumbitForm)} className="space-y-6">
+          <form onSubmit={handleSubmit(submitForm)} className="space-y-6">
             {/* Email */}
             <div className="w-full">
               <label htmlFor="email">Email Address</label>
@@ -93,7 +100,11 @@ function Login() {
                 Forgot Password
               </Link>
             </div>
-            <button type="submit" className="btn btn-neutral">
+            <button
+              disabled={isLoading || !isDirty || !isValid}
+              type="submit"
+              className="btn btn-neutral"
+            >
               Submit
             </button>
             <div className="normalFlex">
