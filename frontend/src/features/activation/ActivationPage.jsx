@@ -1,11 +1,30 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useActivate } from "./activateUser";
 
 const ActivationPage = () => {
-  const isError = false;
+  const [params] = useSearchParams();
+  const activationToken = params.get("activationToken");
+
+  const { error, isError, isLoading, activate } = useActivate();
+
+  useEffect(() => {
+    if (activationToken) {
+      activate({ activationToken });
+    }
+  }, [activationToken]);
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <p className="text-xl">Loading...</p>
+      </div>
+    );
+  }
   return (
     <div className="w-full h-screen flex items-center justify-center flex-col">
       {isError ? (
-        <p className="text-xl text-red-500">Invalid token</p>
+        <p className="text-xl text-red-500">{error.data.message}</p>
       ) : (
         <>
           <p className="text-xl">Your Account has been created successfully</p>

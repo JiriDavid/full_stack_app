@@ -1,5 +1,7 @@
 import axios from "axios"
 import toast from "react-hot-toast"
+import { activateUser } from "../features/activation/activationApi"
+import { resetPassword } from "../features/resetPassword/resetPassApi"
 
 axios.defaults.baseURL= "http://localhost:4000/api/v1"
 axios.defaults.withCredentials = true
@@ -41,7 +43,15 @@ const Account = {
   login: (data) => request.post("/user/login", data),
   loadUser: () => request.get("/user/loadUser"),
   logoutUser: () => request.post("/user/logout", {}),
-  registerUser: (data) => request.post("/user/register", data)
+  registerUser: (data) => request.post("/user/register", data),
+  activateUser: (data) => request.post("/user/activate", data),
+  forgotPassword: (data) => request.post("/user/forgotPassword", data),
+  resetPassword: (data) => request.post(`/user/resetPassword/${data.resetToken}`, data),
+}
+
+const Product = {
+  getAllProducts: (params) => request.get("/product", params),
+  getProductDeatils: (id) => request.get(`/product/${id}`),
 }
 
 const agent = {

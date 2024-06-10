@@ -94,7 +94,7 @@ function Login() {
                 </label>
               </div>
               <Link
-                to={"/"}
+                to={"/forgotPassword"}
                 className="font-medium text-accent hover:text-accent-focus"
               >
                 Forgot Password

@@ -1,31 +1,107 @@
-import React from "react";
+import React, { useState } from "react";
+import { BsFillHeartFill, BsHeart } from "react-icons/bs";
+import { format } from "timeago.js";
+import { Link } from "react-router-dom";
+import { useLike, useUnlike } from "../../app/hooks/like";
+import { useUser } from "../../app/hooks/loadUser";
+import { useNavigate } from "react-router-dom";
 
-function Card() {
+function Card({ product, lastElementRef }) {
+  const { likeAProduct } = useLike(product?._id);
+  const { unlikeAProduct } = useUnlike(product?._id);
+  const { user } = useUser();
+  const navigate = useNavigate();
+
+  const likes = JSON.parse(localStorage.getItem("likes"));
+  const isProductLiked = likes?.some((lk) => lk.product._id === product?._id);
+
+  const [isLike, setIslike] = useState(isProductLiked);
+
+  const handleLike = (e) => {
+    e.preventDefault();
+    if (!user) return navigate("/login");
+
+    setIslike(!isLike);
+    likeAProduct(product?._id);
+  };
+
+  const handleUnlike = (e) => {
+    e.preventDefault();
+
+    if (!user) return navigate("/login");
+    setIslike(!isLike);
+    unlikeAProduct(product?._id);
+  };
   return (
-    <div className="card bg-base-100 shadow-xl p-0">
-      <figure>
-        <img
-          src="https://images.unsplash.com/photo-1516478177764-9fe5bd7e9717?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Shoes"
-          className="h-56 w-full object-cover"
-        />
-      </figure>
-      <div className="card-body p-4 justify-start text-left">
-        <h2 className="card-title">
-          <div className="badge badge-neutral p-4 rounded-lg uppercase">
-            no brand
+    <Link ref={lastElementRef} to={`/${product._id}`}>
+      <div className="card  bg-base-100 shadow-xl">
+        <figure className="relative">
+          <img
+            src={product.images[0]}
+            alt="Shoes"
+            className={`h-56 w-full object-cover ${
+              product?.status !== "sale" && "filter brightness-[0.23]"
+            }`}
+          />
+
+          {product?.status !== "sale" && (
+            <p className=" absolute text-red-500 text-xl text-center">
+              {product?.status}
+            </p>
+          )}
+          {isLike ? (
+            <BsFillHeartFill
+              onClick={handleUnlike}
+              size={25}
+              className="absolute top-3 right-3 cursor-pointer text-red-500 z-30"
+            />
+          ) : (
+            <BsHeart
+              onClick={handleLike}
+              size={25}
+              className="absolute top-3 right-3 cursor-pointer text-gray-500 z-30"
+            />
+          )}
+        </figure>
+        <div className="card-body 800px:p-4">
+          <h2 className="card-title">
+            <div className="badge badge-neutral p-4 rounded-lg uppercase">
+              {product.brand}
+            </div>
+            <div className="badge badge-primary">{product.condition}</div>
+          </h2>
+
+          <div className=" flex gap-5 items-start">
+            <h1 className="font-bold text-2xl">
+              {product?.discountPrice
+                ? product?.discountPrice
+                : product?.originalPrice}
+              $
+            </h1>
+            {product?.discountPrice && (
+              <p className="text-sm  line-through text-red-500">
+                {product.originalPrice}
+              </p>
+            )}
           </div>
-          <div className="badge badge-primary">NEW</div>
-        </h2>
-        <h2 className="font-bold text-2xl">$900</h2>
-        <p>If a dog chews shoes whose shoes does he choose?</p>
-        <div className="card-actions justify-start">
-          <div className="badge badge-outline">Fashion</div>
-          <div className="badge badge-outline">Products</div>
+          <p>
+            {product.title.slice(0, 24)} {product?.title.length > 28 && "..."}
+          </p>
+          <div className="card-actions justify-start">
+            {product.shippingFee === 0 && (
+              <div className="badge badge-outline">Free Shipping</div>
+            )}
+            {product?.size && (
+              <div className="badge badge-outline">{product?.size}</div>
+            )}
+          </div>
+
+          <p className="text-sm font-light text-gray-400">
+            {format(product.createdAt)}
+          </p>
         </div>
-        <p className="font-light text-sm text-gray-400">2 weeks ago</p>
       </div>
-    </div>
+    </Link>
   );
 }
 
